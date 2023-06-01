@@ -1,6 +1,5 @@
 use core::panic;
 use std::{ fs::{self, File}, io::{stdin, Write}, env::{self} };
-use colored::{Colorize, ColoredString};
 use rand::Rng;
 use regex::{ Regex };
 
@@ -186,33 +185,15 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
 
     // I/O
     46 => { // .
-      let flag = stack.pop() as u8;
-      let b_b = stack.pop() as u8;
-      let g_b = stack.pop() as u8;
-      let r_b = stack.pop() as u8;
-      let b = stack.pop() as u8;
-      let g = stack.pop() as u8;
-      let r = stack.pop() as u8;
+      let s = stack.pop().to_string();
 
-      let mut s = stack.pop().to_string().normal();
-      s = format_string(s, flag);
-
-      print!("{}", s.truecolor(r, g, b).on_truecolor(r_b, g_b, b_b));
+      print!("{s}");
       old_move
     },
     44 => unsafe { // ,
-      let flag = stack.pop() as u8;
-      let b_b = stack.pop() as u8;
-      let g_b = stack.pop() as u8;
-      let r_b = stack.pop() as u8;
-      let b = stack.pop() as u8;
-      let g = stack.pop() as u8;
-      let r = stack.pop() as u8;
+      let s = char::from_u32_unchecked(stack.pop() as u32);
 
-      let mut s = (char::from_u32_unchecked(stack.pop() as u32)).to_string().normal();
-      s = format_string(s, flag);
-
-      print!("{}", s.truecolor(r, g, b).on_truecolor(r_b, g_b, b_b));
+      print!("{s}");
       old_move
     },
     38 => unsafe { // &
@@ -281,27 +262,6 @@ fn jump(x: &usize, y: &usize, old_move: Move) -> Move {
       Move::Right => Move::Jump { cords: [x + 2, *y], move_after: Box::new(Move::Right) },
       Move::Jump { cords: _, move_after: next_move } => jump(x, y, *next_move),
       _ => unreachable!()
-  }
-}
-
-fn format_string(s: ColoredString, flag: u8) -> ColoredString {
-  match flag {
-    1 => s.bold(),
-    2 => s.italic(),
-    3 => s.underline(),
-    4 => s.strikethrough(),
-    5 => s.bold().italic(),
-    6 => s.bold().underline(),
-    7 => s.bold().strikethrough(),
-    8 => s.strikethrough().italic(),
-    9 => s.strikethrough().underline(),
-    10 => s.italic().underline(),
-    11 => s.bold().italic().underline(),
-    12 => s.bold().italic().strikethrough(),
-    13 => s.bold().underline().strikethrough(),
-    14 => s.italic().underline().strikethrough(),
-    15 => s.bold().italic().underline().strikethrough(),
-    _ => s
   }
 }
 
