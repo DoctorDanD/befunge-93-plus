@@ -1,5 +1,5 @@
 [package]
-name = "befunge-93-"
+name = "befunge-93-plus"
 description = "A rust-powered interpreter for the befunge-93 esolang, with a few modifications."
 version = "1.0.1"
 edition = "2021"
