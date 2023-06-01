@@ -250,7 +250,7 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
     }
     64 => Move::End, // @
 
-    _ => panic!("Unrecognized Command Character found!") 
+    _ => old_move
   }
 }
 
