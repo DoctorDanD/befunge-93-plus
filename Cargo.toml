@@ -1,0 +1,13 @@
+[package]
+name = "befunge-colored"
+description = "A rust-powered interpreter for the befunge-colored esolang"
+version = "0.1.2"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+colored = "2.0.0"
+rand = "0.8.5"
+regex = "1.8.1"
