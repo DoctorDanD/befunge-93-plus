@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "befunge-93-plus"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "rand",
  "regex",

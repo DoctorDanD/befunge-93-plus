@@ -1,4 +1,4 @@
-use core::panic;
+use core::{ panic };
 use std::{ fs::{self, File}, io::{stdin, Write}, env::{self} };
 use rand::Rng;
 use regex::{ Regex };
@@ -204,7 +204,7 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
       stdin().read_line(&mut input_text).expect("Failed to read from stdin");
       let trimmed = input_text.trim();
       let str_match = REGEX.as_ref().unwrap().find(trimmed);
-      if str_match.is_some() { println!("{}", str_match.unwrap().as_str()) }
+      if str_match.is_some() { stack.push(str_match.unwrap().as_str().parse().unwrap()) }
       old_move
     },
     b'~' => {
