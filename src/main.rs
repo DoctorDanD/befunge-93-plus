@@ -68,6 +68,9 @@ fn execute_grid(mut grid: Vec<Vec<u8>>) {
   let mut next_move = Move::Right;
 
   while next_move != Move::End {
+    if y > grid.len() { y = 0 }
+    if x > grid.get(y).unwrap().len() { x = 0 }
+
     let code: u8 = grid.get(y).unwrap_or(&OUT_OF_BOUNDS.to_vec()).get(x).unwrap_or(&32).clone();
     next_move = execute(&code, &mut stack, &mut grid, &x, &y, next_move);
 
@@ -101,59 +104,59 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
 
   match code {
     // Movement
-    32 => old_move, // SPACE
-    94 => Move::Up,    // ^ 
-    118 => Move::Down, // v 
-    60 => Move::Left,  // < 
-    62 => Move::Right, // > 
-    95 => if stack.peek().is_some() && stack.pop() != 0 { Move::Left } else { Move::Right } // _ 
-    124 => if stack.peek().is_some() && stack.pop() != 0 { Move::Up } else { Move::Down }   // |
-    63 => match rand::thread_rng().gen_range(0..5) { // ?
+    b' ' => old_move,
+    b'^' => Move::Up,   
+    b'v' => Move::Down, 
+    b'<' => Move::Left, 
+    b'>' => Move::Right,
+    b'_' => if  stack.pop() != 0 { Move::Left } else { Move::Right } 
+    b'|' => if  stack.pop() != 0 { Move::Up } else { Move::Down }  
+    b'?' => match rand::thread_rng().gen_range(0..5) {
       1 => Move::Up,
       2 => Move::Down,
       3 => Move::Left,
       4 => Move::Right,
       _ => old_move
     }
-    35 => jump(x, y, old_move), // #
+    b'#' => jump(x, y, old_move ),
 
     // Arithemetic
-    43 => { // +
+    b'+' => {
       let a = stack.pop();
       let b = stack.pop();
       stack.push(a + b);
       old_move
     },
-    45 => { // -
+    b'-' => {
       let a = stack.pop();
       let b = stack.pop();
       stack.push(b - a);
       old_move
     },
-    42 => { // *
+    b'*' => { 
       let a = stack.pop();
       let b = stack.pop();
       stack.push(a * b);
       old_move
     },
-    47 => { // /
+    b'/' => {
       let a = stack.pop();
       let b = stack.pop();
       stack.push(b / a);
       old_move
     },
-    37 => { // %
+    b'%' => {
       let a = stack.pop();
       let b = stack.pop();
       stack.push(b % a);
       old_move
     },
-    33 => { // !
+    b'!' => { // !
       let a = stack.pop();
       if a == 0 { stack.push(1) } else { stack.push(0) }
       old_move
     },
-    96 => { // `
+    b'`' => {
       let a = stack.pop();
       let b = stack.pop();
       if b > a { stack.push(1) } else { stack.push(0) }
@@ -165,38 +168,38 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
       stack.push(*code as i32 - 48);
       old_move
     },
-    34 => { // "
+    b'"' => {
       unsafe { STRING_PARSE = !STRING_PARSE; }
       old_move
     },
-    58 => { // :
+    b':' => {
       let a = stack.peek().unwrap_or(&0);
       stack.push(*a);
       old_move
     },
-    92 => { // \
+    b'\\' => {
       let a = stack.pop();
       let b = stack.pop();
       stack.push(a);
       stack.push(b);
       old_move
     },
-    36 => { stack.pop(); old_move }, // $
+    b'$' => { stack.pop(); old_move },
 
     // I/O
-    46 => { // .
-      let s = stack.pop().to_string();
+    b'.' => { 
+      let s = stack.pop();
 
       print!("{s}");
       old_move
     },
-    44 => unsafe { // ,
-      let s = char::from_u32_unchecked(stack.pop() as u32);
+    b',' => { 
+      let s = stack.pop() as u8;
 
-      print!("{s}");
+      print!("{}", s as char);
       old_move
     },
-    38 => unsafe { // &
+    b'&' => unsafe {
       let mut input_text = String::new();
       stdin().read_line(&mut input_text).expect("Failed to read from stdin");
       let trimmed = input_text.trim();
@@ -204,7 +207,7 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
       if str_match.is_some() { println!("{}", str_match.unwrap().as_str()) }
       old_move
     },
-    126 => { // ~
+    b'~' => {
       let mut input_text = String::new();
       stdin().read_line(&mut input_text).expect("Failed to read from stdin");
       stack.push(*input_text.as_bytes().get(0).expect("Invalid Input Detected") as i32);
@@ -212,17 +215,14 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
     }
 
     // Misc
-    103 => { // g
+    b'g' => { 
       let y = stack.pop();
       let x = stack.pop();
       let v = *grid.get(y as usize).unwrap_or(&OUT_OF_BOUNDS.to_vec()).get(x as usize).unwrap_or(&32) as i32;
-      match v {
-          32 => stack.push(0),
-          other => stack.push(other)
-      }
+      stack.push(v);
       old_move
     },
-    112 => unsafe { // s
+    b'p' => unsafe { 
       let y = stack.pop();
       let x = stack.pop();
       let v = stack.pop();
@@ -248,7 +248,7 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
       
       old_move
     }
-    64 => Move::End, // @
+    b'@' => Move::End,
 
     _ => old_move
   }
