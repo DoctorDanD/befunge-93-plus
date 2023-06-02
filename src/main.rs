@@ -190,7 +190,7 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
     b'.' => { 
       let s = stack.pop();
 
-      print!("{s}");
+      print!("{s} ");
       old_move
     },
     b',' => { 
