@@ -1,5 +1,5 @@
 use core::{ panic };
-use std::{ fs::{self, File}, io::{stdin, Write}, env::{self} };
+use std::{ fs::{self, File}, io::{stdin, Write, Read}, env::{self} };
 use rand::Rng;
 use regex::{ Regex };
 
@@ -208,9 +208,9 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
       old_move
     },
     b'~' => {
-      let mut input_text = String::new();
-      stdin().read_line(&mut input_text).expect("Failed to read from stdin");
-      stack.push(*input_text.as_bytes().get(0).expect("Invalid Input Detected") as i32);
+      let mut buf = String::new();
+      stdin().take(1).read_to_string(&mut buf).unwrap();
+      print!("{}", buf);
       old_move
     }
 

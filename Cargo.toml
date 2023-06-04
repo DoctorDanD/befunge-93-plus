@@ -1,12 +1,13 @@
 [package]
 name = "befunge-93-plus"
 description = "A rust-powered interpreter for the befunge-93 esolang, with a few modifications."
-version = "1.0.5"
+version = "1.0.6"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+console = "0.15.7"
 rand = "0.8.5"
 regex = "1.8.1"
