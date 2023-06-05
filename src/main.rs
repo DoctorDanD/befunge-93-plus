@@ -1,5 +1,5 @@
 use core::{ panic };
-use std::{ fs::{self, File}, io::{stdin, Write, Read}, env::{self} };
+use std::{ fs::{self, File}, io::{stdin, Write}, env::{self} };
 use rand::Rng;
 use regex::{ Regex };
 
@@ -9,6 +9,7 @@ const OUT_OF_BOUNDS: [u8; 1] = [32];
 static mut STRING_PARSE: bool = false;
 static mut REGEX: Option<Regex> = None;
 static mut FILEPATH: String = String::new();
+static mut CACHED_INPUT: Option<Vec<u8>> = None;
 
 #[derive(Debug)]
 struct Stack {
@@ -37,6 +38,7 @@ fn main() {
   unsafe {
     FILEPATH = args[1].clone();
     REGEX.replace(Regex::new(r"\b[0-9]+?\b").unwrap());
+    CACHED_INPUT.replace(vec![]);
 
     let source = fs::read_to_string(&FILEPATH).expect(FILE_NOT_FOUND_ERROR);
     grid = parse_grid(source);
@@ -207,10 +209,16 @@ fn match_code(code: &u8, stack: &mut Stack, grid: &mut Vec<Vec<u8>>, x: &usize, 
       if str_match.is_some() { stack.push(str_match.unwrap().as_str().parse().unwrap()) }
       old_move
     },
-    b'~' => {
+    b'~' => unsafe {
       let mut buf = String::new();
-      stdin().take(1).read_to_string(&mut buf).unwrap();
-      print!("{}", buf);
+      if CACHED_INPUT.as_mut().unwrap().len() < 1 { 
+        stdin().read_line(&mut buf).unwrap();
+        CACHED_INPUT.as_mut().unwrap().append(buf.as_mut_vec());
+        CACHED_INPUT.as_mut().unwrap().pop();
+      }
+
+      stack.push(*CACHED_INPUT.as_mut().unwrap().get(0).unwrap() as i32);
+      CACHED_INPUT.as_mut().unwrap().remove(0);
       old_move
     }
 
